@@ -1,66 +1,44 @@
 # Anashi Candles
 
-This project is now arranged into separate `frontend` and `backend` folders.
+Simple React + Vite website for the `ANASHI CANDLES` product catalog.
 
-## Structure
+## Project Structure
 
-`frontend/`
-React + Vite website UI.
+`src/assets/products`
+All product images used in the site.
 
-`frontend/src/assets/products`
-Product images.
+`src/components`
+Reusable UI pieces like navbar, footer, and product card.
 
-`frontend/src/components`
-Reusable frontend UI components.
+`src/context`
+Shared cart state and cart hooks.
 
-`frontend/src/pages`
-Frontend pages like Home, Shop, Cart, Checkout.
+`src/data`
+Product list and store notices.
 
-`frontend/src/data`
-Frontend product and notice data.
-
-`backend/`
-Simple Express server.
-
-`backend/server.js`
-Backend entry file.
+`src/pages`
+Main screens like Home, Shop, Cart, Checkout, and Product Detail.
 
 ## How To Run
 
-### Frontend
+Prerequisite: `Node.js` installed
 
-1. Open terminal in project root:
+1. Open terminal in the project folder:
    `cd /Users/anand/Desktop/candle`
-2. Install frontend packages:
-   `cd frontend && npm install`
-3. Start frontend:
+2. Install dependencies:
+   `npm install`
+3. Start the development server:
    `npm run dev`
-4. Open:
+4. Open in browser:
    `http://localhost:3000`
 
-### Backend
+## Useful Commands
 
-1. Open another terminal:
-   `cd /Users/anand/Desktop/candle/backend`
-2. Install backend packages:
-   `npm install`
-3. Start backend:
-   `npm run dev`
-4. API check:
-   `http://localhost:5000/api/health`
+`npm run dev`
+Starts the local development server.
 
-## Root Shortcuts
+`npm run build`
+Creates the production build in `dist/`.
 
-From `/Users/anand/Desktop/candle` you can also use:
-
-`npm run dev:frontend`
-Run frontend from root.
-
-`npm run dev:backend`
-Run backend from root.
-
-`npm run build:frontend`
-Build frontend from root.
-
-`npm run lint:frontend`
-Type-check frontend from root.
+`npm run lint`
+Runs the TypeScript check.
