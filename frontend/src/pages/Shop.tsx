@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { Filter, ChevronDown, Search } from 'lucide-react';
-import { products } from '../data/products';
-import ProductCard from '../components/ProductCard';
+import { ChevronDown, Search } from 'lucide-react';
+import { ProductCard } from '../components';
+import { products } from '../data';
 
 const Shop = () => {
   const [filter, setFilter] = useState('All');

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Heart } from 'lucide-react';
-import { Product } from '../data/products';
-import { useCart } from '../context/CartContext';
 import { motion } from 'motion/react';
+import { useCart } from '../context';
+import { Product } from '../data';
 
 interface ProductCardProps {
   product: Product;

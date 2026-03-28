@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Product } from '../data/products';
+import { Product } from '../data';
 
 interface CartItem extends Product {
   quantity: number;

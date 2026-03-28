@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ShoppingBag, MessageCircle, Heart, Minus, Plus, ArrowLeft, Truck, ShieldCheck } from 'lucide-react';
-import { products } from '../data/products';
-import { useCart } from '../context/CartContext';
+import { ShoppingBag, MessageCircle, Minus, Plus, ArrowLeft, Truck, ShieldCheck } from 'lucide-react';
+import { useCart } from '../context';
+import { products } from '../data';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -78,7 +78,7 @@ const ProductDetail = () => {
               <div className="flex items-center space-x-4 mb-6">
                 <span className="text-3xl font-bold text-light-brown">₹{product.price}</span>
                 <span className="px-3 py-1 bg-soft-pink/30 text-light-brown text-[10px] font-bold rounded-full">
-                  Only ₹30 😍
+                  In Stock
                 </span>
               </div>
               <p className="text-light-brown/70 leading-relaxed">
@@ -155,7 +155,7 @@ const ProductDetail = () => {
                 </div>
                 <div>
                   <h4 className="text-xs font-bold">Free Delivery</h4>
-                  <p className="text-[10px] text-light-brown/50">In Parul Hostels</p>
+                  <p className="text-[10px] text-light-brown/50">Available</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
