@@ -1,5 +1,11 @@
+export { default as About } from './About';
+export { default as AdminDashboard } from './AdminDashboard';
+export { default as AdminLogin } from './AdminLogin';
 export { default as Cart } from './Cart';
 export { default as Checkout } from './Checkout';
+export { default as Contact } from './Contact';
+export { default as Gallery } from './Gallery';
 export { default as Home } from './Home';
 export { default as ProductDetail } from './ProductDetail';
 export { default as Shop } from './Shop';
+export { default as Tracking } from './Tracking';

@@ -1,59 +1,101 @@
-import React from 'react';
+import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Instagram, MessageCircle, Heart } from 'lucide-react';
+import { Instagram, Mail, MessageCircle, Phone } from 'lucide-react';
 
-const Footer = () => {
+import { brandName, brandTagline, contactEmail, instagramUrl, supportPhone, whatsappNumber } from '../data';
+
+export default function Footer() {
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!email.trim()) {
+      return;
+    }
+    setSubmitted(true);
+    setEmail('');
+  };
+
   return (
-    <footer className="bg-beige pt-16 pb-8">
-      <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-          <div className="col-span-1 md:col-span-2">
-            <Link to="/" className="text-3xl font-serif font-bold tracking-widest text-light-brown mb-6 block">
-              ANASHI
-            </Link>
-            <p className="text-light-brown/70 max-w-md mb-6">
-              Soft little candles, made with love. We bring aesthetic, handmade vibes to your space at an affordable price.
-            </p>
-            <div className="flex space-x-4">
-              <a href="#" className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm hover:shadow-md transition-all">
-                <Instagram size={20} />
-              </a>
-              <a href="https://wa.me/91XXXXXXXXXX" className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm hover:shadow-md transition-all">
-                <MessageCircle size={20} />
-              </a>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="font-serif font-bold text-lg mb-6">Quick Links</h4>
-            <ul className="space-y-4 text-sm">
-              <li><Link to="/" className="hover:text-soft-pink transition-colors">Home</Link></li>
-              <li><Link to="/shop" className="hover:text-soft-pink transition-colors">Shop All</Link></li>
-              <li><Link to="/cart" className="hover:text-soft-pink transition-colors">My Cart</Link></li>
-              <li><Link to="/checkout" className="hover:text-soft-pink transition-colors">Checkout</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-serif font-bold text-lg mb-6">Support</h4>
-            <ul className="space-y-4 text-sm">
-              <li><a href="#" className="hover:text-soft-pink transition-colors">Shipping Policy</a></li>
-              <li><a href="#" className="hover:text-soft-pink transition-colors">Refund Policy</a></li>
-              <li><a href="#" className="hover:text-soft-pink transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-soft-pink transition-colors">Contact Us</a></li>
-            </ul>
+    <footer className="border-t border-stone-200 bg-[#f7f1ea]">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 lg:grid-cols-[1.4fr,1fr,1fr,1.1fr]">
+        <div>
+          <Link to="/" className="font-display text-3xl text-stone-900">
+            {brandName}
+          </Link>
+          <p className="mt-4 max-w-md text-sm leading-7 text-stone-600">{brandTagline}</p>
+          <div className="mt-6 flex gap-3">
+            <a href={instagramUrl} target="_blank" rel="noreferrer" className="icon-button" aria-label="Instagram">
+              <Instagram size={18} />
+            </a>
+            <a
+              href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hi, I want to order candles.')}`}
+              target="_blank"
+              rel="noreferrer"
+              className="icon-button"
+              aria-label="WhatsApp"
+            >
+              <MessageCircle size={18} />
+            </a>
           </div>
         </div>
 
-        <div className="border-t border-light-brown/10 pt-8 flex flex-col md:row justify-between items-center text-xs text-light-brown/50">
-          <p>© 2026 ANASHI. All rights reserved.</p>
-          <p className="mt-2 md:mt-0 flex items-center">
-            Made with <Heart size={12} className="mx-1 text-soft-pink fill-soft-pink" /> in India
+        <div>
+          <h3 className="font-display text-xl text-stone-900">Navigation</h3>
+          <div className="mt-4 grid gap-3 text-sm text-stone-600">
+            <Link to="/">Home</Link>
+            <Link to="/shop">Shop</Link>
+            <Link to="/gallery">Gallery</Link>
+            <Link to="/about">About</Link>
+            <Link to="/contact">Contact</Link>
+            <Link to="/tracking">Track Order</Link>
+          </div>
+        </div>
+
+        <div>
+          <h3 className="font-display text-xl text-stone-900">Policies</h3>
+          <div className="mt-4 grid gap-3 text-sm leading-7 text-stone-600">
+            <p>All candles are non-refundable</p>
+            <p>Slight color or design variation may occur</p>
+            <p>Keep away from direct heat before use</p>
+            <p>Use on a heat-safe surface</p>
+            <p>Never leave candles unattended</p>
+          </div>
+        </div>
+
+        <div>
+          <h3 className="font-display text-xl text-stone-900">Newsletter</h3>
+          <form className="mt-4 space-y-3" onSubmit={handleSubmit}>
+            <input
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="Email address"
+              className="w-full rounded-full border border-stone-200 bg-white px-5 py-3 text-sm outline-none transition focus:border-stone-400"
+            />
+            <button type="submit" className="button-primary w-full">
+              Subscribe
+            </button>
+          </form>
+          <p className="mt-3 text-sm text-stone-500">
+            {submitted ? 'You are subscribed for restocks and offers.' : 'Get restocks, offers, and candle updates.'}
           </p>
+          <div className="mt-6 space-y-2 text-sm text-stone-600">
+            <p className="inline-flex items-center gap-2">
+              <Mail size={16} />
+              <span>{contactEmail}</span>
+            </p>
+            <p className="inline-flex items-center gap-2">
+              <Phone size={16} />
+              <span>{supportPhone}</span>
+            </p>
+          </div>
         </div>
+      </div>
+      <div className="border-t border-stone-200 px-4 py-5 text-center text-xs text-stone-500">
+        © 2026 {brandName}. Light up your moments.
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

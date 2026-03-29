@@ -1,23 +1,21 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { Trash2, Minus, Plus, ArrowRight, ShoppingBag } from 'lucide-react';
-import { useCart } from '../context/CartContext';
+import { Minus, Plus, Trash2 } from 'lucide-react';
 
-const Cart = () => {
-  const { cart, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
+import { PageMeta } from '../components';
+import { useCart } from '../context';
 
-  if (cart.length === 0) {
+export default function Cart() {
+  const { cart, subtotal, discount, totalPrice, removeFromCart, updateQuantity } = useCart();
+
+  if (!cart.length) {
     return (
-      <div className="pt-32 pb-20 bg-cream min-h-screen flex flex-center items-center justify-center">
-        <div className="text-center px-6">
-          <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-sm">
-            <ShoppingBag size={40} className="text-light-brown/20" />
-          </div>
-          <h1 className="text-3xl font-serif font-bold mb-4">Your cart is empty</h1>
-          <p className="text-light-brown/60 mb-8">Looks like you haven't added any aesthetic candles yet.</p>
-          <Link to="/shop" className="btn-primary inline-block">
-            Start Shopping
+      <div className="page-shell">
+        <PageMeta title="Cart" />
+        <div className="mx-auto max-w-3xl px-4 text-center">
+          <h1 className="font-display text-5xl text-stone-900">Your cart is empty</h1>
+          <p className="mt-4 text-stone-600">Add a candle or gift set to start your checkout.</p>
+          <Link to="/shop" className="button-primary mt-8 inline-flex">
+            Start shopping
           </Link>
         </div>
       </div>
@@ -25,103 +23,80 @@ const Cart = () => {
   }
 
   return (
-    <div className="pt-32 pb-20 bg-cream min-h-screen">
-      <div className="container mx-auto px-6">
-        <h1 className="text-4xl font-serif font-bold mb-12">Shopping Cart</h1>
+    <div className="page-shell">
+      <PageMeta title="Cart" description="Review candle selections and order totals before checkout." />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-6">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 lg:grid-cols-[1.08fr,0.92fr]">
+        <section>
+          <h1 className="font-display text-5xl text-stone-900">Shopping cart</h1>
+          <div className="mt-8 space-y-4">
             {cart.map((item) => (
-              <motion.div
-                key={`${item.id}-${item.selectedColor}`}
-                layout
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white p-6 rounded-3xl shadow-sm flex items-center space-x-6"
-              >
-                <div className="w-24 h-32 rounded-2xl overflow-hidden flex-shrink-0">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-
-                <div className="flex-1">
-                  <div className="flex justify-between items-start mb-2">
+              <article key={item.cartItemId} className="grid gap-5 rounded-[2rem] border border-stone-200 bg-white p-5 shadow-soft md:grid-cols-[10rem,1fr]">
+                <img src={item.image} alt={item.name} className="h-48 w-full rounded-[1.5rem] object-cover md:h-full" />
+                <div className="flex flex-col justify-between gap-5">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <h3 className="font-serif font-bold text-lg">{item.name}</h3>
-                      <p className="text-xs text-light-brown/50">{item.selectedColor || 'Default'}</p>
+                      <h2 className="font-display text-3xl text-stone-900">{item.name}</h2>
+                      <p className="mt-2 text-sm text-stone-500">
+                        {item.selectedColor} • {item.selectedFragrance}
+                      </p>
+                      <p className="mt-2 text-sm text-stone-500">
+                        Gift packaging: {item.giftPackaging ? 'Yes' : 'No'}
+                      </p>
+                      {item.customMessage ? <p className="mt-2 text-sm text-stone-500">Message: {item.customMessage}</p> : null}
                     </div>
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      className="p-2 text-red-400 hover:bg-red-50 rounded-full transition-colors"
-                    >
-                      <Trash2 size={18} />
+                    <button type="button" onClick={() => removeFromCart(item.cartItemId)} className="icon-button" aria-label="Remove item">
+                      <Trash2 size={16} />
                     </button>
                   </div>
-
-                  <div className="flex justify-between items-center mt-4">
-                    <div className="flex items-center bg-cream rounded-full p-1">
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="p-1 hover:bg-white rounded-full transition-colors"
-                      >
-                        <Minus size={14} />
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div className="inline-flex items-center rounded-full border border-stone-200 bg-stone-50 p-1">
+                      <button type="button" onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)} className="icon-button">
+                        <Minus size={16} />
                       </button>
-                      <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="p-1 hover:bg-white rounded-full transition-colors"
-                      >
-                        <Plus size={14} />
+                      <span className="w-10 text-center text-sm">{item.quantity}</span>
+                      <button type="button" onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)} className="icon-button">
+                        <Plus size={16} />
                       </button>
                     </div>
-                    <span className="font-bold text-light-brown">₹{item.price * item.quantity}</span>
+                    <p className="text-lg font-semibold text-stone-900">Rs.{item.price * item.quantity}</p>
                   </div>
                 </div>
-              </motion.div>
+              </article>
             ))}
           </div>
+        </section>
 
-          {/* Summary */}
-          <div className="lg:col-span-1">
-            <div className="bg-white p-8 rounded-3xl shadow-sm sticky top-32">
-              <h2 className="text-2xl font-serif font-bold mb-8">Order Summary</h2>
-              
-              <div className="space-y-4 mb-8">
-                <div className="flex justify-between text-sm">
-                  <span className="text-light-brown/60">Subtotal ({totalItems} items)</span>
-                  <span className="font-medium">₹{totalPrice}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-light-brown/60">Shipping</span>
-                  <span className="text-green-500 font-medium">FREE</span>
-                </div>
-                <div className="border-t border-light-brown/10 pt-4 flex justify-between">
-                  <span className="font-bold">Total</span>
-                  <span className="text-2xl font-bold text-light-brown">₹{totalPrice}</span>
-                </div>
-              </div>
+        <aside className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-soft lg:sticky lg:top-28 lg:h-fit">
+          <h2 className="font-display text-3xl text-stone-900">Order summary</h2>
 
-              <Link to="/checkout" className="btn-primary w-full flex items-center justify-center space-x-2">
-                <span>Proceed to Checkout</span>
-                <ArrowRight size={18} />
-              </Link>
-              
-              <div className="mt-6 text-center">
-                <p className="text-[10px] text-light-brown/40 uppercase tracking-widest">
-                  Secure Checkout • Handmade with Love
-                </p>
-              </div>
+          <div className="mt-6 space-y-4 text-sm text-stone-600">
+            <div className="flex items-center justify-between">
+              <span>Subtotal</span>
+              <span>Rs.{subtotal}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Discount</span>
+              <span>- Rs.{discount}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Shipping</span>
+              <span>Free</span>
             </div>
           </div>
-        </div>
+
+          <div className="mt-6 border-t border-stone-200 pt-6">
+            <div className="flex items-center justify-between text-lg font-semibold text-stone-900">
+              <span>Total</span>
+              <span>Rs.{totalPrice}</span>
+            </div>
+          </div>
+
+          <Link to="/checkout" className="button-primary mt-8 w-full justify-center">
+            Proceed to checkout
+          </Link>
+        </aside>
       </div>
     </div>
   );
-};
-
-export default Cart;
+}

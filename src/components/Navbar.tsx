@@ -1,102 +1,95 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { ShoppingBag, Menu, X, Instagram } from 'lucide-react';
-import { useCart } from '../context/CartContext';
-import { motion, AnimatePresence } from 'motion/react';
+import { useEffect, useState } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Menu, ShoppingBag, User, X } from 'lucide-react';
 
-const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const { totalItems } = useCart();
+import { brandName } from '../data';
+import { useCart } from '../context';
+
+const navLinks = [
+  { label: 'Home', to: '/' },
+  { label: 'Shop', to: '/shop' },
+  { label: 'Gallery', to: '/gallery' },
+  { label: 'About', to: '/about' },
+  { label: 'Contact', to: '/contact' },
+  { label: 'Track Order', to: '/tracking' },
+];
+
+export default function Navbar() {
   const location = useLocation();
+  const { totalItems } = useCart();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    setMobileOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 16);
+    onScroll();
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => {
-    setIsOpen(false);
-  }, [location]);
-
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Shop', path: '/shop' },
-    { name: 'About', path: '/#about' },
-    { name: 'Contact', path: '/#contact' },
-  ];
-
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'glass py-3' : 'bg-transparent py-5'}`}>
-      <div className="container mx-auto px-6 flex justify-between items-center">
-        <Link to="/" className="text-2xl font-serif font-bold tracking-widest text-light-brown">
-          ANASHI
-        </Link>
-
-        {/* Desktop Links */}
-        <div className="hidden md:flex items-center space-x-8">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.path}
-              className="text-sm font-medium hover:text-soft-pink transition-colors"
-            >
-              {link.name}
-            </Link>
-          ))}
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <Link to="/cart" className="relative p-2 hover:bg-white/20 rounded-full transition-colors">
-            <ShoppingBag size={20} />
-            {totalItems > 0 && (
-              <span className="absolute top-0 right-0 bg-soft-pink text-light-brown text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full shadow-sm">
-                {totalItems}
-              </span>
-            )}
+    <header className={`fixed inset-x-0 top-0 z-40 transition duration-300 ${scrolled ? 'px-4 py-3' : 'px-4 py-5'}`}>
+      <div className={`mx-auto max-w-7xl rounded-full border border-white/60 px-5 py-3 shadow-soft backdrop-blur-xl ${scrolled ? 'bg-white/85' : 'bg-white/70'}`}>
+        <div className="flex items-center justify-between gap-4">
+          <Link to="/" className="font-display text-2xl text-stone-900">
+            {brandName}
           </Link>
-          <button
-            className="md:hidden p-2"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+
+          <nav className="hidden items-center gap-7 lg:flex">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  `text-sm transition ${isActive ? 'text-stone-950' : 'text-stone-600 hover:text-stone-900'}`
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-2">
+            <Link to="/admin" className="icon-button hidden sm:inline-flex" aria-label="Admin panel">
+              <User size={18} />
+            </Link>
+            <Link to="/cart" className="icon-button relative" aria-label="Shopping cart">
+              <ShoppingBag size={18} />
+              {totalItems ? (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-stone-900 text-[10px] text-white">
+                  {totalItems}
+                </span>
+              ) : null}
+            </Link>
+            <button type="button" className="icon-button lg:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle menu">
+              {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </div>
         </div>
+
+        {mobileOpen ? (
+          <nav className="mt-4 grid gap-2 border-t border-stone-200 pt-4 lg:hidden">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  `rounded-2xl px-4 py-3 text-sm ${isActive ? 'bg-stone-900 text-white' : 'bg-stone-50 text-stone-700'}`
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
+            <NavLink to="/admin" className="rounded-2xl bg-stone-50 px-4 py-3 text-sm text-stone-700">
+              Admin
+            </NavLink>
+          </nav>
+        ) : null}
       </div>
-
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="md:hidden absolute top-full left-0 right-0 glass border-t border-white/20 shadow-xl"
-          >
-            <div className="flex flex-col p-6 space-y-4">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  className="text-lg font-medium py-2 border-b border-light-brown/10"
-                >
-                  {link.name}
-                </Link>
-              ))}
-              <div className="flex space-x-4 pt-4">
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-light-brown">
-                  <Instagram size={20} />
-                </a>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
+    </header>
   );
-};
-
-export default Navbar;
+}

@@ -1,234 +1,254 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { ShoppingBag, MessageCircle, Truck, ShieldCheck, Clock, Heart, Sparkles, Flame, Gift } from 'lucide-react';
-import { productImages } from '../assets/products';
-import { ProductCard } from '../components';
-import { notices, products } from '../data';
+import { ArrowRight, Check, Flame, Gift, ShieldCheck, Sparkles, Truck } from 'lucide-react';
 
-const Home = () => {
+import {
+  brandMetrics,
+  brandName,
+  brandTagline,
+  galleryImages,
+  instagramUrl,
+  notices,
+  testimonials,
+  whatsappNumber,
+} from '../data';
+import { useCart } from '../context';
+import { PageMeta, ProductCard, RatingStars, SectionHeading } from '../components';
+
+export default function Home() {
+  const { products } = useCart();
+  const featuredProducts = products.filter((product) => product.featured).slice(0, 4);
+  const bestSellers = products.slice(0, 3);
+  const galleryPreview = galleryImages.slice(0, 6);
+
   return (
-    <div className="overflow-x-hidden">
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img
-            src={productImages.daisyCollection}
-            alt="Anashi candle collection"
-            className="w-full h-full object-cover brightness-[0.85]"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-cream/90"></div>
-        </div>
+    <div className="overflow-hidden">
+      <PageMeta title="Aesthetic Handmade Candles" description="ANASHI CANDLES offers soft aesthetic handmade candles for gifts, room decor, and cozy vibes." />
 
-        <div className="container mx-auto px-6 relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <span className="inline-block px-4 py-1 bg-white/30 backdrop-blur-md rounded-full text-white text-xs font-bold tracking-widest uppercase mb-6">
-              In Stock Now
-            </span>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold text-white mb-6 leading-tight">
-              Anashi Candles
+      <section className="hero-shell pt-28">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-18 pt-8 lg:grid-cols-[1.1fr,0.9fr] lg:items-center">
+          <div>
+            <p className="eyebrow mb-5">Now in stock and ready to deliver</p>
+            <h1 className="font-display text-5xl leading-[0.95] text-stone-950 sm:text-6xl lg:text-8xl">
+              {brandName}
             </h1>
-            <p className="text-xl md:text-2xl text-white/90 mb-10 font-light">
-              Soft. Aesthetic. Made with Love 🤍
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-              <Link to="/shop" className="btn-primary w-full sm:w-auto flex items-center justify-center space-x-2">
-                <ShoppingBag size={20} />
-                <span>Shop Now</span>
+            <p className="mt-6 max-w-xl text-lg leading-8 text-stone-700">{brandTagline}</p>
+            <p className="mt-4 max-w-xl text-base leading-7 text-stone-600">Perfect for gifts, room decor, and cozy vibes. DM to place your order now.</p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link to="/shop" className="button-primary">
+                Order Now
               </Link>
-              <a
-                href="https://wa.me/91XXXXXXXXXX?text=Hi%20I%20want%20to%20order"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-secondary w-full sm:w-auto flex items-center justify-center space-x-2"
-              >
-                <MessageCircle size={20} />
-                <span>Order on WhatsApp</span>
-              </a>
+              <Link to="/shop" className="button-secondary">
+                Explore Candles
+              </Link>
             </div>
-          </motion.div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/50"
-        >
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center p-1">
-            <div className="w-1 h-2 bg-white/50 rounded-full"></div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-cream">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { icon: <Truck size={24} />, title: "Free Delivery", sub: "Available" },
-              { icon: <ShieldCheck size={24} />, title: "Cash on Delivery", sub: "Available" },
-              { icon: <Clock size={24} />, title: "Ready to Deliver", sub: "In Stock" },
-              { icon: <Heart size={24} />, title: "Handmade", sub: "Made with Love" },
-            ].map((feature, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                viewport={{ once: true }}
-                className="text-center"
-              >
-                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm text-light-brown">
-                  {feature.icon}
-                </div>
-                <h3 className="font-bold text-sm mb-1">{feature.title}</h3>
-                <p className="text-xs text-light-brown/60">{feature.sub}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Best Sellers Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12">
-            <div>
-              <span className="text-soft-pink font-bold text-sm uppercase tracking-widest mb-2 block">Product Range</span>
-              <h2 className="text-4xl md:text-5xl font-serif font-bold">Now In Stock</h2>
+            <div className="mt-8 grid gap-4 text-sm text-stone-700 sm:grid-cols-3">
+              <div className="feature-pill">
+                <Truck size={16} />
+                <span>Free delivery available</span>
+              </div>
+              <div className="feature-pill">
+                <ShieldCheck size={16} />
+                <span>Cash on Delivery</span>
+              </div>
+              <div className="feature-pill">
+                <Gift size={16} />
+                <span>In stock now</span>
+              </div>
             </div>
-            <Link to="/shop" className="text-sm font-bold border-b-2 border-soft-pink pb-1 mt-4 md:mt-0">
-              View All Products
-            </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Highlights Section */}
-      <section className="py-20 bg-beige relative overflow-hidden">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4">Why People Pick Anashi</h2>
-            <p className="text-light-brown/60">Perfect for gifts, room decor, and cozy vibes.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {[
-              {
-                icon: <Sparkles size={24} />,
-                title: 'Soft Aesthetic Finish',
-                text: 'Each candle is handmade with slight variations that make every piece feel unique.',
-                image: productImages.roseCandles,
-              },
-              {
-                icon: <Gift size={24} />,
-                title: 'Gift-Ready Products',
-                text: 'Daisy, heart, bubble, and rose candles are styled for gifting and cute room setups.',
-                image: productImages.heartMarbleDisplay,
-              },
-              {
-                icon: <Flame size={24} />,
-                title: 'Made for Cozy Moments',
-                text: 'Decorative candles that bring warmth, softness, and a premium handmade feel.',
-                image: productImages.roseDisplay,
-              },
-            ].map((item, idx) => (
-              <motion.div
-                key={item.title}
-                whileHover={{ scale: 1.02 }}
-                className="bg-white rounded-3xl shadow-sm overflow-hidden flex flex-col text-center relative"
-              >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-56 object-cover"
-                />
-                <div className="p-8 flex flex-col items-center">
-                  <div className="w-12 h-12 bg-cream rounded-2xl flex items-center justify-center text-light-brown mb-5">
-                    {item.icon}
-                  </div>
-                  <h3 className="text-2xl font-serif font-bold mb-3">{item.title}</h3>
-                  <p className="text-sm text-light-brown/60 mb-8">{item.text}</p>
-                  <Link to="/shop" className="btn-primary w-full">
-                    Shop Now
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Instructions */}
-      <section className="py-20 bg-cream">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-serif font-bold mb-4">Important Instructions</h2>
-            <p className="text-light-brown/60">Please read before placing your order.</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {notices.map((notice) => (
-              <motion.div
-                key={notice}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                className="bg-white p-6 rounded-2xl shadow-sm text-light-brown/80"
-              >
-                <p>{notice}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Trust Elements */}
-      <section className="py-20 bg-white border-t border-light-brown/5">
-        <div className="container mx-auto px-6 text-center">
-          <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10 items-center">
-            <div className="rounded-[2rem] overflow-hidden shadow-lg">
-              <img
-                src={productImages.heartMarbleDisplay}
-                alt="Heart candle gift set"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <h2 className="text-3xl font-serif font-bold mb-6">Perfect for Gifts, Decor & Cozy Vibes</h2>
-              <p className="text-light-brown/70 mb-10">
-                We are in stock and ready to deliver. Place your order on WhatsApp and pay with cash on delivery.
-              </p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <span className="px-6 py-2 bg-beige rounded-full text-xs font-bold uppercase tracking-widest">Limited Stock</span>
-                <span className="px-6 py-2 bg-soft-pink rounded-full text-xs font-bold uppercase tracking-widest">COD Available</span>
-                <span className="px-6 py-2 bg-accent rounded-full text-xs font-bold uppercase tracking-widest">Free Delivery</span>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <img src={featuredProducts[0]?.image} alt={featuredProducts[0]?.name} className="hero-image sm:mt-12" />
+            <div className="grid gap-4">
+              <img src={featuredProducts[1]?.image} alt={featuredProducts[1]?.name} className="hero-image h-64 sm:h-72" />
+              <div className="rounded-[2rem] bg-stone-900 p-6 text-white shadow-soft">
+                <p className="text-sm uppercase tracking-[0.25em] text-stone-300">Store notice</p>
+                <p className="mt-4 text-2xl font-medium">All candles are non-refundable. Slight variation is part of the aesthetic finish.</p>
+                <a
+                  href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hi, I want to order candles.')}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-6 inline-flex items-center gap-2 text-sm text-stone-200"
+                >
+                  Order on WhatsApp
+                  <ArrowRight size={16} />
+                </a>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Sticky Order Now Button (Mobile Only) */}
-      <div className="md:hidden fixed bottom-6 left-6 right-6 z-40">
-        <Link to="/shop" className="btn-primary w-full flex items-center justify-center space-x-2 shadow-2xl py-4">
-          <ShoppingBag size={20} />
-          <span>Shop Now</span>
-        </Link>
-      </div>
+      <section className="section-shell">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="grid gap-4 md:grid-cols-4">
+            {brandMetrics.map((metric) => (
+              <article key={metric.label} className="stat-card">
+                <p className="text-sm uppercase tracking-[0.2em] text-stone-500">{metric.label}</p>
+                <p className="mt-3 font-display text-4xl text-stone-950">{metric.value}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section-shell">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <SectionHeading
+              eyebrow="In Stock Candles"
+              title="Soft handmade candles in cute shapes and aesthetic colors."
+              description="Daisy, bubble, heart, and rose candles are available now with simple pricing and COD support."
+            />
+            <Link to="/shop" className="inline-flex items-center gap-2 text-sm font-medium text-stone-900">
+              View all candles
+              <ArrowRight size={16} />
+            </Link>
+          </div>
+          <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section-shell bg-[#f8f2ed]">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 lg:grid-cols-[0.95fr,1.05fr] lg:items-center">
+          <div>
+            <SectionHeading
+              eyebrow="About ANASHI"
+              title="A small candle brand focused on soft, aesthetic pieces made with love."
+              description="ANASHI CANDLES is built around simple handmade designs that feel giftable, pretty, and cozy from the moment they arrive."
+            />
+            <div className="mt-8 space-y-4 text-sm leading-7 text-stone-600">
+              <p>Each candle is designed to work beautifully as decor before it is ever lit, with colors and shapes that suit bedrooms, study tables, and thoughtful gifts.</p>
+              <p>Because every piece is handmade, slight color and design variation may happen, which is part of the charm and finish of the product.</p>
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {bestSellers.map((product) => (
+              <article key={product.id} className="overflow-hidden rounded-[2rem] bg-white shadow-soft">
+                <img src={product.image} alt={product.name} loading="lazy" className="h-60 w-full object-cover" />
+                <div className="p-5">
+                  <p className="badge mb-3 inline-flex">{product.badge}</p>
+                  <h3 className="font-display text-2xl text-stone-900">{product.name}</h3>
+                  <p className="mt-2 text-sm leading-6 text-stone-600">{product.description}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section-shell">
+        <div className="mx-auto max-w-7xl px-4">
+          <SectionHeading
+            eyebrow="Why Choose Our Candles"
+            title="Clear pricing, simple ordering, and aesthetic handmade designs."
+            description="The important details stay visible up front: stock status, free delivery, COD, and candle care instructions."
+            align="center"
+          />
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {[
+              {
+                icon: Sparkles,
+                title: 'Soft aesthetic look',
+                text: 'Cute shapes, gentle colors, and handmade finishes that work for decor and gifting.',
+              },
+              {
+                icon: Check,
+                title: 'Simple ordering',
+                text: 'The catalog keeps prices, available colors, stock status, and key notes visible without extra clutter.',
+              },
+              {
+                icon: Flame,
+                title: 'Safety-first care',
+                text: 'Important burn and storage guidance stays visible across the storefront so expectations are clear.',
+              },
+            ].map((item) => (
+              <article key={item.title} className="rounded-[2rem] border border-stone-200 bg-white p-7 shadow-soft">
+                <item.icon size={22} className="text-stone-900" />
+                <h3 className="mt-5 font-display text-2xl text-stone-900">{item.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-stone-600">{item.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section-shell bg-stone-950 text-white">
+        <div className="mx-auto max-w-7xl px-4">
+          <SectionHeading
+            eyebrow="Customer Testimonials"
+            title="Loved for gifting, decor, and cozy vibes."
+            description="Customers usually mention the handmade finish, cute presentation, and how easy the candles are to gift."
+          />
+          <div className="mt-10 grid gap-6 lg:grid-cols-3">
+            {testimonials.map((testimonial) => (
+              <article key={testimonial.id} className="rounded-[2rem] border border-white/10 bg-white/5 p-7">
+                <RatingStars rating={testimonial.rating} />
+                <p className="mt-5 text-lg leading-8 text-stone-100">“{testimonial.quote}”</p>
+                <div className="mt-6 text-sm text-stone-300">
+                  <p>{testimonial.name}</p>
+                  <p>{testimonial.role}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section-shell">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <SectionHeading
+              eyebrow="Instagram / Candle Gallery"
+              title="A closer look at the candle styles and colors."
+              description="Browse the gallery for daisy, heart, rose, and other aesthetic candle setups."
+            />
+            <a href={instagramUrl} target="_blank" rel="noreferrer" className="button-secondary">
+              Visit Instagram
+            </a>
+          </div>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {galleryPreview.map((image) => (
+              <article key={image.id} className="overflow-hidden rounded-[2rem]">
+                <img src={image.image} alt={image.alt} loading="lazy" className="h-72 w-full object-cover transition duration-500 hover:scale-105" />
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section-shell bg-[#fff8f4]">
+        <div className="mx-auto max-w-7xl px-4">
+          <SectionHeading
+            eyebrow="Store Notices"
+            title="Important instructions before ordering and use."
+            description="These notes stay visible because they directly affect delivery expectations, refunds, and candle safety."
+            align="center"
+          />
+          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+            {notices.map((notice) => (
+              <article key={notice} className="rounded-[1.75rem] border border-stone-200 bg-white p-5 text-sm leading-7 text-stone-600 shadow-soft">
+                {notice}
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section-shell">
+        <div className="mx-auto max-w-5xl rounded-[2.5rem] bg-[#ead9cb] px-6 py-14 text-center shadow-soft md:px-12">
+          <SectionHeading
+            eyebrow="Order on DM"
+            title="ANASHI CANDLES is in stock and ready to deliver."
+            description="Use WhatsApp or Instagram DM to place your order for gifts, decor pieces, and cozy room candles."
+            align="center"
+          />
+        </div>
+      </section>
     </div>
   );
-};
-
-export default Home;
+}

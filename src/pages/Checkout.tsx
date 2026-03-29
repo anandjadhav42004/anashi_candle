@@ -1,188 +1,177 @@
-import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { CheckCircle2, QrCode, Truck, CreditCard, ArrowLeft } from 'lucide-react';
-import { useCart } from '../context/CartContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { FormEvent, useState } from 'react';
+import { Link } from 'react-router-dom';
 
-const Checkout = () => {
-  const { cart, totalPrice, clearCart } = useCart();
-  const navigate = useNavigate();
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
+import { PageMeta } from '../components';
+import { useCart } from '../context';
+import { PaymentMethod } from '../data';
+
+const paymentMethods: PaymentMethod[] = ['Cash on Delivery'];
+
+export default function Checkout() {
+  const { cart, subtotal, discount, totalPrice, activeCoupon, placeOrder } = useCart();
+  const [statusMessage, setStatusMessage] = useState('');
+  const [completedOrderId, setCompletedOrderId] = useState('');
+  const [emailNotifications, setEmailNotifications] = useState<string[]>([]);
+  const [form, setForm] = useState({
     name: '',
+    email: '',
     phone: '',
-    address: '',
-    payment: 'COD'
+    line1: '',
+    line2: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    paymentMethod: 'Cash on Delivery' as PaymentMethod,
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const result = placeOrder({
+      customer: {
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+      },
+      address: {
+        line1: form.line1,
+        line2: form.line2,
+        city: form.city,
+        state: form.state,
+        postalCode: form.postalCode,
+      },
+      paymentMethod: form.paymentMethod,
+    });
+
+    setStatusMessage(result.message);
+
+    if (result.ok && result.order) {
+      setCompletedOrderId(result.order.id);
+      setEmailNotifications(result.order.notifications);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setStep(2);
-    // In a real app, send to backend
-  };
-
-  const handlePlaceOrder = () => {
-    // Generate WhatsApp message
-    const itemsText = cart.map(item => `${item.quantity}x ${item.name} (${item.selectedColor || 'Default'})`).join(', ');
-    const message = `Hi! I want to place an order.\n\nName: ${formData.name}\nPhone: ${formData.phone}\nAddress: ${formData.address}\nItems: ${itemsText}\nTotal: ₹${totalPrice}\nPayment: ${formData.payment}`;
-    
-    window.open(`https://wa.me/91XXXXXXXXXX?text=${encodeURIComponent(message)}`, '_blank');
-    
-    setStep(3);
-    setTimeout(() => {
-      clearCart();
-    }, 1000);
-  };
-
-  if (cart.length === 0 && step !== 3) {
+  if (!cart.length && !completedOrderId) {
     return (
-      <div className="pt-32 pb-20 text-center">
-        <h1 className="text-2xl mb-4">Your cart is empty</h1>
-        <Link to="/shop" className="btn-primary">Back to Shop</Link>
+      <div className="page-shell">
+        <PageMeta title="Checkout" />
+        <div className="mx-auto max-w-3xl px-4 text-center">
+          <h1 className="font-display text-5xl text-stone-900">Your cart is empty</h1>
+          <Link to="/shop" className="button-primary mt-8 inline-flex">
+            Continue shopping
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (completedOrderId) {
+    return (
+      <div className="page-shell">
+        <PageMeta title="Order Confirmed" />
+        <div className="mx-auto max-w-4xl rounded-[2.5rem] border border-stone-200 bg-white p-8 text-center shadow-soft">
+          <p className="eyebrow">Order placed</p>
+          <h1 className="font-display text-5xl text-stone-900">Thank you for your order</h1>
+          <p className="mt-4 text-stone-600">Your order ID is {completedOrderId}. Use it on the tracking page to monitor delivery progress.</p>
+          <div className="mt-8 space-y-3 rounded-[2rem] bg-[#f8f2ed] p-6 text-left text-sm text-stone-600">
+            {emailNotifications.map((notification) => (
+              <p key={notification}>{notification}</p>
+            ))}
+          </div>
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link to="/tracking" className="button-primary">
+              Track order
+            </Link>
+            <Link to="/shop" className="button-secondary">
+              Continue shopping
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="pt-32 pb-20 bg-cream min-h-screen">
-      <div className="container mx-auto px-6 max-w-4xl">
-        
-        {step === 1 && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-4xl font-serif font-bold mb-8">Checkout</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-bold mb-2 text-light-brown/70">Full Name</label>
-                  <input
-                    required
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="w-full px-6 py-3 bg-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-soft-pink/50"
-                    placeholder="Enter your name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold mb-2 text-light-brown/70">Phone Number</label>
-                  <input
-                    required
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    className="w-full px-6 py-3 bg-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-soft-pink/50"
-                    placeholder="Enter phone number"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold mb-2 text-light-brown/70">Hostel / Address</label>
-                  <textarea
-                    required
-                    name="address"
-                    rows={3}
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    className="w-full px-6 py-3 bg-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-soft-pink/50 resize-none"
-                    placeholder="Enter your hostel name & room number"
-                  ></textarea>
-                </div>
-                <button type="submit" className="btn-primary w-full">
-                  Continue to Payment
+    <div className="page-shell">
+      <PageMeta title="Checkout" description="Checkout for ANASHI CANDLES with address form, COD selection, and order summary." />
+
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 lg:grid-cols-[1.05fr,0.95fr]">
+        <form onSubmit={handleSubmit} className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-soft">
+          <h1 className="font-display text-5xl text-stone-900">Checkout</h1>
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            <input required value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} className="input-field" placeholder="Full name" />
+            <input required type="email" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} className="input-field" placeholder="Email address" />
+            <input required value={form.phone} onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))} className="input-field" placeholder="Phone number" />
+            <input required value={form.postalCode} onChange={(event) => setForm((current) => ({ ...current, postalCode: event.target.value }))} className="input-field" placeholder="Postal code" />
+          </div>
+
+          <div className="mt-4 grid gap-4">
+            <input required value={form.line1} onChange={(event) => setForm((current) => ({ ...current, line1: event.target.value }))} className="input-field" placeholder="Address line 1" />
+            <input value={form.line2} onChange={(event) => setForm((current) => ({ ...current, line2: event.target.value }))} className="input-field" placeholder="Address line 2" />
+            <div className="grid gap-4 md:grid-cols-2">
+              <input required value={form.city} onChange={(event) => setForm((current) => ({ ...current, city: event.target.value }))} className="input-field" placeholder="City" />
+              <input required value={form.state} onChange={(event) => setForm((current) => ({ ...current, state: event.target.value }))} className="input-field" placeholder="State" />
+            </div>
+          </div>
+
+          <div className="mt-8">
+            <h2 className="font-display text-3xl text-stone-900">Payment selection</h2>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              {paymentMethods.map((method) => (
+                <button
+                  key={method}
+                  type="button"
+                  onClick={() => setForm((current) => ({ ...current, paymentMethod: method }))}
+                  className={`rounded-[1.5rem] border px-4 py-4 text-left text-sm transition ${
+                    form.paymentMethod === method ? 'border-stone-900 bg-stone-900 text-white' : 'border-stone-200 bg-white text-stone-700'
+                  }`}
+                >
+                  {method}
                 </button>
-              </form>
-
-              <div className="bg-white p-8 rounded-3xl shadow-sm h-fit">
-                <h3 className="font-serif font-bold text-xl mb-6">Order Summary</h3>
-                <div className="space-y-4 mb-6">
-                  {cart.map(item => (
-                    <div key={item.id} className="flex justify-between text-sm">
-                      <span className="text-light-brown/60">{item.quantity}x {item.name}</span>
-                      <span className="font-medium">₹{item.price * item.quantity}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="border-t border-light-brown/10 pt-4 flex justify-between font-bold">
-                  <span>Total</span>
-                  <span>₹{totalPrice}</span>
-                </div>
-              </div>
+              ))}
             </div>
-          </motion.div>
-        )}
-
-        {step === 2 && (
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
-            <button onClick={() => setStep(1)} className="flex items-center space-x-2 text-sm mb-8">
-              <ArrowLeft size={16} />
-              <span>Back to Details</span>
-            </button>
-            <h1 className="text-4xl font-serif font-bold mb-8">Payment Method</h1>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-              <button
-                onClick={() => setFormData({ ...formData, payment: 'COD' })}
-                className={`p-8 rounded-3xl border-2 transition-all flex flex-col items-center text-center ${
-                  formData.payment === 'COD' ? 'border-light-brown bg-white shadow-md' : 'border-transparent bg-white/50'
-                }`}
-              >
-                <Truck size={32} className="mb-4" />
-                <h3 className="font-bold mb-2">Cash on Delivery</h3>
-                <p className="text-xs text-light-brown/50">Pay when you receive your candles</p>
-              </button>
-
-              <button
-                onClick={() => setFormData({ ...formData, payment: 'UPI' })}
-                className={`p-8 rounded-3xl border-2 transition-all flex flex-col items-center text-center ${
-                  formData.payment === 'UPI' ? 'border-light-brown bg-white shadow-md' : 'border-transparent bg-white/50'
-                }`}
-              >
-                <QrCode size={32} className="mb-4" />
-                <h3 className="font-bold mb-2">UPI / QR Code</h3>
-                <p className="text-xs text-light-brown/50">Scan and pay instantly</p>
-              </button>
-            </div>
-
-            {formData.payment === 'UPI' && (
-              <div className="bg-white p-8 rounded-3xl shadow-sm mb-12 text-center">
-                <p className="text-sm mb-6 font-bold">Scan to Pay ₹{totalPrice}</p>
-                <div className="w-48 h-48 bg-cream mx-auto mb-6 flex items-center justify-center rounded-2xl border-2 border-dashed border-light-brown/20">
-                  <QrCode size={100} className="text-light-brown/20" />
-                  <span className="absolute text-[10px] uppercase tracking-widest text-light-brown/40">QR Code Placeholder</span>
-                </div>
-                <p className="text-xs text-light-brown/50 italic">Please take a screenshot after payment</p>
-              </div>
-            )}
-
-            <button onClick={handlePlaceOrder} className="btn-primary w-full py-5 text-lg">
-              Place Order via WhatsApp
-            </button>
-          </motion.div>
-        )}
-
-        {step === 3 && (
-          <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-20">
-            <div className="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8">
-              <CheckCircle2 size={48} />
-            </div>
-            <h1 className="text-4xl font-serif font-bold mb-4">Order Placed!</h1>
-            <p className="text-light-brown/60 mb-12 max-w-md mx-auto">
-              Thank you for choosing ANASHI. We've sent your order details to WhatsApp. We'll contact you soon for confirmation!
+            <p className="mt-4 text-sm text-stone-500">
+              Cash on Delivery is currently available for orders.
             </p>
-            <Link to="/" className="btn-primary">
-              Back to Home
-            </Link>
-          </motion.div>
-        )}
+          </div>
 
+          {statusMessage ? <p className="mt-6 text-sm text-stone-500">{statusMessage}</p> : null}
+
+          <button type="submit" className="button-primary mt-8">
+            Place order
+          </button>
+        </form>
+
+        <aside className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-soft lg:sticky lg:top-28 lg:h-fit">
+          <h2 className="font-display text-3xl text-stone-900">Order summary</h2>
+          <div className="mt-6 space-y-4">
+            {cart.map((item) => (
+              <div key={item.cartItemId} className="flex items-center justify-between gap-4 text-sm text-stone-600">
+                <div>
+                  <p className="font-medium text-stone-900">{item.name}</p>
+                  <p>
+                    {item.quantity} x Rs.{item.price}
+                  </p>
+                </div>
+                <span>Rs.{item.quantity * item.price}</span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 space-y-3 border-t border-stone-200 pt-6 text-sm text-stone-600">
+            <div className="flex items-center justify-between">
+              <span>Subtotal</span>
+              <span>Rs.{subtotal}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Discount {activeCoupon ? `(${activeCoupon.code})` : ''}</span>
+              <span>- Rs.{discount}</span>
+            </div>
+            <div className="flex items-center justify-between text-lg font-semibold text-stone-900">
+              <span>Total</span>
+              <span>Rs.{totalPrice}</span>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   );
-};
-
-export default Checkout;
+}
