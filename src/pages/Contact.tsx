@@ -30,7 +30,7 @@ export default function Contact() {
     const mailtoUrl = `mailto:${contactEmail}?subject=${encodeURIComponent(`ANASHI CANDLES Inquiry from ${form.name}`)}&body=${encodeURIComponent(inquiry)}`;
 
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    window.open(mailtoUrl, '_blank', 'noopener,noreferrer');
+    window.location.href = mailtoUrl;
     setSubmitted(true);
   };
 
@@ -99,7 +99,7 @@ export default function Contact() {
           <button type="submit" className="button-primary mt-6">
             Send on WhatsApp and Email
           </button>
-          {submitted ? <p className="mt-4 text-sm text-stone-500">WhatsApp and email opened in separate tabs or apps. This page stays open so you can keep browsing.</p> : null}
+          {submitted ? <p className="mt-4 text-sm text-stone-500">WhatsApp chat and email draft opened with the customer inquiry details.</p> : null}
         </form>
       </section>
     </div>
